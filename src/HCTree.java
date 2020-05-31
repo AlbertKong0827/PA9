@@ -223,20 +223,23 @@ public class HCTree {
      * @throws IOException
      */
     public void encode(byte symbol, BitOutputStream out) throws IOException {
-        HCNode rootNode = (HCNode) priorityQueue.peek();
+        Stack<Integer> result = new Stack();
         int i = 0;
+
         while(i < leaves.length){
             if(leaves[i].getSymbol() == symbol){
                 HCNode temp = leaves[i];
                 while(temp.getParent()!=null){
                     if(temp.getParent().getC0()==temp){
-                        out.writeBit(0);
+                        result.push(0);
                     }else{
-                        out.writeBit(1);
+                        result.push(1);
                     }
                     temp = temp.getParent();
                 }
-                return;
+            }
+            while(!result.isEmpty()){
+                out.writeBit(result.pop());
             }
             i+=1;
         }
@@ -252,8 +255,16 @@ public class HCTree {
      * @throws IOException
      */
     public byte decode(BitInputStream in) throws IOException {
-        byte result = 0;
-        return 0;
+        HCNode curr = this.root;
+        while (curr.getC0()!=null&&curr.getC1()!=null){
+            int temp = in.readBit();
+            if(temp == 0){
+                curr = curr.getC0();
+            }else{
+                curr = curr.getC1();
+            }
+        }
+        return curr.getSymbol();
     }
 
     /**
