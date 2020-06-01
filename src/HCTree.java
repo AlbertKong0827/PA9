@@ -22,7 +22,6 @@ public class HCTree {
     // the leaves of HCTree that contain all the symbols
     private HCNode[] leaves = new HCNode[NUM_CHARS];
 
-    PriorityQueue priorityQueue;
     /**
      * The Huffman Coding Node
      */
@@ -185,41 +184,41 @@ public class HCTree {
     }
 
     /**
-     * TODO
+     * Build a max heap binary tree based on the input data
      *
-     * @param freq
+     * @param freq frequency of each symbol
      */
     public void buildTree(int[] freq) {
-        priorityQueue = new PriorityQueue();
-        for (int i = 0; i < freq.length; i++){
-            leaves[i] = new HCNode((byte)freq[i],freq[i]);
-        }
-        for (int i = 0; i < leaves.length; i++){
-            if(leaves[i].getFreq()>0){
-                priorityQueue.add(leaves[i]);
+        PriorityQueue<HCNode>priorityQueue = new PriorityQueue();
+
+        for (int i = 0; i < freq.length; i++) {
+            byte symbol = (byte) i;
+            HCNode newNode = new HCNode(symbol, freq[i]);
+            leaves[i] = newNode;
+            if(freq[i]>0){
+            priorityQueue.add(leaves[i]);
             }
         }
+
         while(priorityQueue.size() > 1){
-            HCNode rNode = (HCNode) priorityQueue.poll();
-            HCNode lNode = (HCNode) priorityQueue.poll();
+            HCNode lNode = priorityQueue.poll();
+            HCNode rNode = priorityQueue.poll();
             HCNode pNode = new HCNode(lNode.getSymbol(),rNode.getFreq()+lNode.getFreq());
-            for(int i = 0; i < leaves.length; i++){
-                if(leaves[i].equals(rNode)){
-                    pNode.setC0(leaves[i]);
-                }
-                if(leaves[i].equals(lNode)){
-                    pNode.setC1(leaves[i]);
-                }
-            }
+            lNode.setParent(pNode);
+            rNode.setParent(pNode);
+            pNode.setC0(lNode);
+            pNode.setC1(rNode);
             priorityQueue.add(pNode);
         }
+        root = priorityQueue.peek();
+
     }
 
     /**
-     * TODO
+     * encode the word in the document from leaves to root
      *
-     * @param symbol
-     * @param out
+     * @param symbol the symbol to start
+     * @param out output the symbol
      * @throws IOException
      */
     public void encode(byte symbol, BitOutputStream out) throws IOException {
@@ -248,10 +247,10 @@ public class HCTree {
     }
 
     /**
-     * TODO
+     * decode the given input
      *
-     * @param in
-     * @return
+     * @param in the input stream
+     * @return decoded symbol in byte
      * @throws IOException
      */
     public byte decode(BitInputStream in) throws IOException {
@@ -267,27 +266,55 @@ public class HCTree {
         return curr.getSymbol();
     }
 
+
     /**
-     * TODO
+     * encode the entire tree in preorder sequence
      *
-     * @param node
-     * @param out
+     * @param node node to start
+     * @param out the output stream
      * @throws IOException
      */
     public void encodeHCTree(HCNode node, BitOutputStream out) throws IOException {
-        /* TODO */
+        HCNode curr = node;
+        if(curr == null){
+            return;
+        }
+        if(curr.isLeaf()){
+            out.writeBit(1);
+        }else{
+            out.writeBit(0);
+        }
+        out.writeByte(curr.getSymbol());
+        encodeHCTree(curr.c0,out);
+        encodeHCTree(curr.c1,out);
     }
 
     /**
-     * TODO
+     * decode the input
      *
-     * @param in
-     * @return
+     * @param in input stream
+     * @return the decoded node
      * @throws IOException
      */
     public HCNode decodeHCTree(BitInputStream in) throws IOException {
-        /* TODO */
-        return null;
+        HCNode resultNode;
+        int pointer = in.readBit();
+        if(pointer == 1){
+            byte symbol = in.readByte();
+            resultNode = new HCNode(symbol,1);
+            int ascii = symbol & 0xff;
+            leaves[ascii] = resultNode;
+        }else{
+            HCNode lNode = decodeHCTree(in);
+            HCNode rNode = decodeHCTree(in);
+            resultNode = new HCNode(lNode.getSymbol(),1);
+            lNode.setParent(resultNode);
+            rNode.setParent(resultNode);
+            resultNode.setC0(lNode);
+            resultNode.setC1(rNode);
+        }
+        return resultNode;
     }
+
 
 }

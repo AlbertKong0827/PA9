@@ -27,6 +27,7 @@ public class BitOutputStream {
         this.out = out;
     }
 
+
     /**
      * Write the buffer byte to the output, and clear the byte
      *
