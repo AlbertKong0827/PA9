@@ -67,6 +67,9 @@ public class Compress {
 
         // encode HCTree and every byte
         test1.encodeHCTree(test1.getRoot(),bitOut);
+        for (byte symbol: input){
+            test1.encode(symbol,bitOut);
+        }
 
 
         /* END OF TODO */
