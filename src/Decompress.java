@@ -34,7 +34,6 @@ public class Decompress {
         /* START OF TODO */
 
         // read the number of byte from the file
-        byte[] result = new byte[inFile.read()];
         int count = in.readInt();
 
         // decode and build the tree from the "header"

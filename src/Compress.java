@@ -18,6 +18,7 @@ import java.util.Scanner;
 public class Compress {
 
     private static final int EXP_ARG = 2; // number of expected arguments
+    private static final int FULL_SIZE = 256;
 
     public static void main(String[] args) throws IOException {
 
@@ -38,27 +39,11 @@ public class Compress {
         /* START OF TODO */
 
         // construct HCTree from the file
-        String content = "";
-        try{
-            File thisFile = new File(args[0]);
-            Scanner sc = new Scanner(thisFile);
-            while(sc.hasNextLine()){
-                content += sc.nextLine();
-            }
-        }catch (FileNotFoundException e){
-            e.getMessage();
+        int[] freq = new int[FULL_SIZE];
+        for (byte a: input){
+            int symbol = a & 0xff;
+            freq[symbol] += 1;
         }
-        int[] freq = new int[256];
-        for (int i = 0; i < content.length(); i++){
-            int count = 0;
-            for (int j = 0; j < content.length(); j++){
-                if(content.charAt(j) == content.charAt(i)){
-                    count ++;
-                }
-            }
-            freq[(int)content.charAt(i)] = count;
-        }
-
         HCTree test1 = new HCTree();
         test1.buildTree(freq);
 
