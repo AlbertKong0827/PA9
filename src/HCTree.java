@@ -281,12 +281,16 @@ public class HCTree {
         }
         if(curr.isLeaf()){
             out.writeBit(1);
+            out.writeByte(curr.getSymbol());
         }else{
             out.writeBit(0);
+            if(curr.getC0()!=null){
+                encodeHCTree(curr.c0,out);
+            }
+            if(curr.getC1()!=null){
+                encodeHCTree(curr.c1,out);
+            }
         }
-        out.writeByte(curr.getSymbol());
-        encodeHCTree(curr.c0,out);
-        encodeHCTree(curr.c1,out);
     }
 
     /**
