@@ -58,7 +58,10 @@ public class HCTreeTester {
 
         HCTree test1 = new HCTree();
         test1.buildTree(freq);
-        inorder(test1.getRoot());
+        assertEquals(56,test1.getRoot().freq);
+        assertEquals(101,test1.getRoot().symbol);
+        assertEquals(23,test1.getRoot().getC0().freq);
+        assertEquals(33,test1.getRoot().getC1().freq);
 
         int[] freq2 = new int[256];
         String testFile2 = openFile("src/check2.txt");
@@ -74,7 +77,10 @@ public class HCTreeTester {
 
         HCTree test2 = new HCTree();
         test2.buildTree(freq2);
-        inorder(test2.getRoot());
+        assertEquals(50,test2.getRoot().freq);
+        assertEquals(30,test2.getRoot().getC1().freq);
+        assertEquals(20,test2.getRoot().getC0().freq);
+        assertEquals(48,test2.getRoot().getSymbol());
 
         int[] freq3 = new int[256];
         String testFile3 = openFile("src/check3.txt");
@@ -90,7 +96,8 @@ public class HCTreeTester {
 
         HCTree test3 = new HCTree();
         test3.buildTree(freq3);
-        inorder(test3.getRoot());
+        assertEquals(42,test3.getRoot().freq);
+        assertEquals(null,test3.getRoot().getC0());
 
     }
 
